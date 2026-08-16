@@ -156,6 +156,31 @@
       box-shadow: 0 0 15px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.2);
     }
 
+    select#formatSelect {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-weight: 698;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-shadow: 0 0 8px var(--primary);
+      box-shadow: 0 0 8px rgba(0, 243, 255, 0.2), inset 0 0 8px rgba(0, 243, 255, 0.1);
+      outline: none;
+    }
+    
+    select#formatSelect:hover {
+      background: rgba(0, 243, 255, 0.15);
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.2);
+    }
+    
+    select#formatSelect option {
+      background: #02040a;
+      color: var(--primary);
+    }
+
     button.amber {
       color: var(--accent);
       border-color: var(--accent);
@@ -209,6 +234,7 @@
       text-shadow: 0 0 10px var(--primary);
     }
   </style>
+  <script src="https://unpkg.com/webm-muxer/build/webm-muxer.js"></script>
 </head>
 
 <body>
@@ -216,8 +242,7 @@
   <div class="crt-frame">
     <div class="term-header">
       <div class="dots"><span></span><span></span><span></span></div>
-      <div class="title">TINKERHUB_ASCII_VIBRANT_EDITION.exe</div>
-      <div>[SYS_OK]</div>
+      <div class="title">TINKERHUB_ASCII.exe</div>
     </div>
 
     <div class="screen-wrap">
@@ -233,6 +258,10 @@
     <div class="controls">
       <button class="amber" id="playBtn">▶ PLAY</button>
       <button id="restartBtn">↺ RESTART</button>
+      <select id="formatSelect">
+        <option value="pc">💻 16:9</option>
+        <option value="mobile">📱 9:16</option>
+      </select>
       <input type="file" id="posterUpload" accept="image/*" style="display: none;">
       <button class="pink" id="uploadBtn">🖼️ UPLOAD POSTER</button>
       <button class="pink" id="exportBtn">🎥 EXPORT</button>
@@ -248,8 +277,8 @@
   <script>
     "use strict";
 
-    const GRID_COLS = 200, GRID_ROWS = 75; 
-    const CHAR_W = 8, CHAR_H = 12;
+    let GRID_COLS = 200, GRID_ROWS = 75;
+    const CHAR_W = 16, CHAR_H = 24;
     const WORLD_W = 1600, WORLD_H = 900;
     const RAMP = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
 
@@ -257,20 +286,35 @@
     posterImg.src = 'poster.jpg';
 
     const mainCanvas = document.getElementById('mainCanvas');
-    mainCanvas.width = GRID_COLS * CHAR_W;
-    mainCanvas.height = GRID_ROWS * CHAR_H;
     const mctx = mainCanvas.getContext('2d', { alpha: false });
-    mctx.textBaseline = 'top';
-    mctx.font = `bold ${CHAR_H}px 'JetBrains Mono', monospace`;
 
     const sceneCanvas = document.createElement('canvas');
     sceneCanvas.width = WORLD_W; sceneCanvas.height = WORLD_H;
     const sctx = sceneCanvas.getContext('2d', { willReadFrequently: true });
 
     const gridCanvas = document.createElement('canvas');
-    gridCanvas.width = GRID_COLS; gridCanvas.height = GRID_ROWS;
     const gctx = gridCanvas.getContext('2d', { willReadFrequently: true });
-    gctx.imageSmoothingEnabled = true;
+
+    let isMobileMode = false;
+
+    function updateGridSize() {
+      if (isMobileMode) {
+        GRID_COLS = 108;
+        GRID_ROWS = 128;
+      } else {
+        GRID_COLS = 200;
+        GRID_ROWS = 75;
+      }
+      mainCanvas.width = GRID_COLS * CHAR_W;
+      mainCanvas.height = GRID_ROWS * CHAR_H;
+      mctx.textBaseline = 'top';
+      mctx.font = `bold ${CHAR_H}px 'JetBrains Mono', monospace`;
+      
+      gridCanvas.width = GRID_COLS;
+      gridCanvas.height = GRID_ROWS;
+      gctx.imageSmoothingEnabled = true;
+    }
+    updateGridSize();
 
     function lerpVal(a, b, t) {
       if (Array.isArray(a)) return a.map((v, i) => v + (b[i] - v) * t);
@@ -314,10 +358,10 @@
 
     const IMPACTS = [
       { time: 4.15, amp: 30, decay: 6 },
-      { time: 4.8, amp: 40, decay: 6 }, 
+      { time: 4.8, amp: 40, decay: 6 },
       { time: 15.5, amp: 20, decay: 5 },
       { time: 17.2, amp: 50, decay: 4 },
-      { time: 26.1, amp: 120, decay: 3 }
+      { time: 28.6, amp: 120, decay: 3 }
     ];
     function getCameraShake(t) {
       let shakeAmt = 0;
@@ -337,7 +381,7 @@
       sctx.scale(scale * facing, scale);
       sctx.strokeStyle = color;
       sctx.fillStyle = color;
-      sctx.lineWidth = 26 / scale; 
+      sctx.lineWidth = 26 / scale;
       sctx.lineCap = 'round';
       sctx.lineJoin = 'round';
 
@@ -403,7 +447,7 @@
       sctx.translate(x, y);
       sctx.scale(lscale, lscale);
 
-      sctx.fillStyle = '#0a1128'; 
+      sctx.fillStyle = '#0a1128';
       sctx.strokeStyle = '#ffffff';
       sctx.lineWidth = 8;
       sctx.beginPath(); sctx.roundRect(-w / 2, -h / 2, w, h, 20); sctx.fill(); sctx.stroke();
@@ -424,7 +468,7 @@
       sctx.save();
       sctx.translate(x, y);
       sctx.scale(scale, scale);
-      sctx.fillStyle = '#39ff88'; 
+      sctx.fillStyle = '#39ff88';
       sctx.beginPath(); sctx.arc(0, 0, 22, 0, Math.PI * 2); sctx.fill();
       if (scale < 3) {
         sctx.fillStyle = '#000000';
@@ -446,10 +490,10 @@
     const T = {
       runner: [
         { t: 0, v: [1750, 560] }, { t: 3.9, v: [1750, 560] },
-        { t: 4.3, v: [1200, 400] }, 
-        { t: 4.7, v: [700, 350] },  
-        { t: 5.1, v: [880, 560] },  
-        { t: 6.5, v: [880, 560] },  
+        { t: 4.3, v: [1200, 400] },
+        { t: 4.7, v: [700, 350] },
+        { t: 5.1, v: [880, 560] },
+        { t: 6.5, v: [880, 560] },
         { t: 8.5, v: [-100, 560] },
         { t: 9.8, v: [280, 500] },
         { t: 10.8, v: [620, 630] }, { t: 11.9, v: [960, 520] }, { t: 12.7, v: [1230, 600] },
@@ -472,7 +516,7 @@
         { t: 15.6, v: [800, 460] },
       ],
       camX: [
-        { t: 0, v: 0 }, { t: 15.8, v: 0 }, { t: 16.9, v: 780 }, { t: 23, v: 780 },
+        { t: 0, v: 0 }, { t: 15.8, v: 0 }, { t: 16.9, v: 780 }, { t: 25.5, v: 780 },
       ],
       door: [{ t: 0, v: 0 }, { t: 3.9, v: 0 }, { t: 4.15, v: -100 }, { t: 4.35, v: -82 }],
       locker: [{ t: 17.25, v: [1580, -360] }, { t: 17.85, v: [1580, 470] }],
@@ -481,7 +525,7 @@
 
     function drawParallax(t, speed1, speed2, camX, color) {
       sctx.strokeStyle = color;
-      sctx.lineWidth = 14; 
+      sctx.lineWidth = 14;
       sctx.globalAlpha = 0.5;
       for (let i = -1; i < 4; i++) {
         const ox = ((i * 500) - (t * speed1 + camX * 0.2) % 500);
@@ -622,8 +666,8 @@
       if (t > 4.7) {
         const dt = t - 4.7;
         tripAngle = clamp01(dt / 0.4) * 110;
-        tripX = Math.min(dt * 200, 150); 
-        tripY = Math.sin(clamp01(dt / 0.6) * Math.PI) * -120; 
+        tripX = Math.min(dt * 200, 150);
+        tripY = Math.sin(clamp01(dt / 0.6) * Math.PI) * -120;
       }
       sctx.save(); sctx.translate(750 + tripX, 610 + tripY); sctx.rotate(tripAngle * Math.PI / 180);
       drawStick(0, 0, 1, -sway * 0.9, sway * 0.9, 5 + sway * 2, -15 - sway * 2, sway * 1.5, '#39ff88');
@@ -645,26 +689,26 @@
       sctx.restore();
 
       dustBurst(1480, 700, 4.15, t, 12, 42, '#ffea00');
-      dustBurst(750, 500, 4.7, t, 20, 50, '#ffea00'); 
+      dustBurst(750, 500, 4.7, t, 20, 50, '#ffea00');
 
       if (t > 3.85) {
         const pos = kfOvershoot(T.runner, t, 0.05, 3, 6);
 
         let isJumping = (t >= 4.2 && t <= 5.1);
         let flipAngle = 0;
-        if (isJumping && t > 4.3) flipAngle = clamp01((t - 4.3) / 0.8) * -360; 
+        if (isJumping && t > 4.3) flipAngle = clamp01((t - 4.3) / 0.8) * -360;
 
         const running = (t > 3.85 && t < 4.3) || (t > 6.5 && t < 9.0);
         let gait = running ? gaitAngles(t, 8, 40, 55) : { legL: 0, legR: 0, armL: 0, armR: 0 };
 
         if (isJumping) {
-            if (t > 4.6 && t < 4.9) {
-               gait.legL = 80; gait.legR = -40; 
-               gait.armL = -60; gait.armR = 60;
-            } else {
-               gait.legL = 40; gait.legR = 40; 
-               gait.armL = 30; gait.armR = 30;
-            }
+          if (t > 4.6 && t < 4.9) {
+            gait.legL = 80; gait.legR = -40;
+            gait.armL = -60; gait.armR = 60;
+          } else {
+            gait.legL = 40; gait.legR = 40;
+            gait.armL = 30; gait.armR = 30;
+          }
         }
 
         let headTilt = 0;
@@ -681,12 +725,12 @@
           const wag = Math.sin((t - 5.5) * 45) * 12;
           const mouthX = -15, mouthY = -85 * 1.2 - 32 * 1.2 + 25;
 
-          sctx.restore(); 
+          sctx.restore();
           sctx.save(); sctx.translate(pos[0], pos[1]);
           sctx.strokeStyle = '#ff00a0'; sctx.lineWidth = 18; sctx.lineCap = 'round';
-          sctx.beginPath(); 
-          sctx.moveTo(mouthX, mouthY); 
-          sctx.quadraticCurveTo(mouthX - 15, mouthY + 10, mouthX - 25 + wag, mouthY + 35); 
+          sctx.beginPath();
+          sctx.moveTo(mouthX, mouthY);
+          sctx.quadraticCurveTo(mouthX - 15, mouthY + 10, mouthX - 25 + wag, mouthY + 35);
           sctx.stroke();
           sctx.restore();
         } else {
@@ -776,7 +820,7 @@
         drawSpidey(spideyX, spideyY, -1, 0, 0, armL, -20, 0, 1.3);
         drawTinkerCore(spideyX + 30, spideyY - 60, 1.0);
 
-        const wprog = clamp01((t - 18.3) / 0.3); 
+        const wprog = clamp01((t - 16.8) / 0.3);
         if (wprog > 0) {
           sctx.strokeStyle = '#ffffff'; sctx.lineWidth = 40; sctx.lineCap = 'round';
           sctx.save();
@@ -808,7 +852,7 @@
 
     function drawScene4(t) {
       sctx.fillStyle = '#020005'; sctx.fillRect(0, 0, WORLD_W, WORLD_H);
-      const lt = t - 18.6; 
+      const lt = t - 22.6;
 
       sctx.save(); sctx.translate(WORLD_W / 2, WORLD_H / 2);
       sctx.strokeStyle = '#ff003c'; sctx.lineWidth = 10; sctx.globalAlpha = clamp01(lt / 0.6) * 0.8;
@@ -831,7 +875,7 @@
       const textScale = clamp01((lt - 0.3) / 0.6);
       sctx.save(); sctx.textAlign = 'center';
 
-      const maxW = WORLD_W - 100; 
+      const maxW = WORLD_W - 100;
 
       const dateText = 'DATE: 18th August';
       sctx.font = `900 140px sans-serif`;
@@ -856,9 +900,9 @@
       sctx.fillStyle = '#02050a';
       sctx.fillRect(0, 0, WORLD_W, WORLD_H);
 
-      if (t > 25.1) {
-        const startFall = 26.6;
-        const hitTime = startFall + 1.0; 
+      if (t > 27.6) {
+        const startFall = 27.6;
+        const hitTime = startFall + 1.0;
         let y = -400;
 
         if (t < hitTime) {
@@ -872,7 +916,7 @@
         }
 
         sctx.save(); sctx.textAlign = 'center';
-        let angle = y >= 420 ? 0 : Math.sin(t * 15) * 5; 
+        let angle = y >= 420 ? 0 : Math.sin(t * 15) * 5;
         sctx.translate(WORLD_W / 2, y); sctx.rotate(angle * Math.PI / 180);
 
         sctx.fillStyle = '#ffffff'; sctx.font = '900 130px sans-serif';
@@ -898,7 +942,7 @@
           const idle = Math.sin(t * 3) * 3;
 
           let armR = -20 - idle;
-          if (t > hitTime + 0.5) { 
+          if (t > hitTime + 0.5) {
             const raiseProg = clamp01((t - (hitTime + 0.5)) / 0.4);
             const wave = Math.sin(t * 12) * 25 * raiseProg;
             armR = -20 + (raiseProg * 150) + wave;
@@ -906,6 +950,38 @@
 
           drawSpidey(0, 0, -1, 10, -10, 160, armR, 0, 1.2);
           sctx.restore();
+        }
+
+        const btnX = WORLD_W - 120, btnY = 120;
+        const btnHover = t > 31.5;
+        const btnClick = t > 31.7 && t < 31.8;
+
+        sctx.save();
+        sctx.translate(btnX, btnY);
+        if (btnClick) sctx.scale(0.85, 0.85);
+        sctx.strokeStyle = btnClick ? '#ffffff' : (btnHover ? '#ff00a0' : '#00f3ff');
+        sctx.lineWidth = 14;
+        sctx.strokeRect(-50, -50, 100, 100);
+        sctx.beginPath(); sctx.moveTo(-25, -25); sctx.lineTo(25, 25); sctx.stroke();
+        sctx.beginPath(); sctx.moveTo(25, -25); sctx.lineTo(-25, 25); sctx.stroke();
+        sctx.restore();
+
+        let cx = WORLD_W / 2 + 500, cy = WORLD_H + 200;
+        if (t > 30.0) {
+          const prog = clamp01((t - 30.0) / 1.5);
+          const ease = 1 - Math.pow(1 - prog, 3);
+          cx = cx + (btnX - cx) * ease;
+          cy = cy + (btnY - cy) * ease;
+        }
+
+        if (t > 30.0) {
+          drawCursor(cx, cy, 1.4, btnClick);
+        }
+
+        if (t > 31.8) {
+          const fadeProg = clamp01((t - 31.8) / 0.8);
+          sctx.fillStyle = `rgba(2, 5, 10, ${fadeProg})`;
+          sctx.fillRect(0, 0, WORLD_W, WORLD_H);
         }
       }
     }
@@ -924,16 +1000,52 @@
 
       if (t < 8.5) drawScene1(t);
       else if (t < 13) drawScene2(t);
-      else if (t < 21.1) drawScene3(t);
-      else if (t < 25.1) drawScene4(t);
+      else if (t < 22.6) drawScene3(t);
+      else if (t < 27.6) drawScene4(t);
       else drawScene5(t);
 
       sctx.restore();
     }
 
-    function renderAscii() {
+    function getPanScanX(t) {
+      if (t < 2.0) return 800;
+      let localT = t - 2.0;
+      if (localT < 8.5) {
+        return kfOvershoot(T.runner, localT, 0.05, 3, 6)[0];
+      } else if (localT < 13) {
+        return kfOvershoot(T.runner, localT, 0.04, 3.5, 7)[0];
+      } else if (localT < 22.6) {
+        const rp = kfOvershoot(T.runner, localT, 0.05, 3, 6);
+        const camX = kfValue(T.camX, localT);
+        if (localT > 16.5) {
+           const spideyCanvasX = 1900 - camX;
+           const blend = clamp01((localT - 16.5) / 1.0);
+           return (rp[0] - camX) * (1 - blend) + spideyCanvasX * blend;
+        }
+        return rp[0] - camX;
+      } else if (localT < 27.6) {
+        return WORLD_W / 2;
+      } else {
+        if (localT > 30.0) {
+           const prog = clamp01((localT - 30.0) / 1.5);
+           const ease = 1 - Math.pow(1 - prog, 3);
+           return 800 + (1480 - 800) * ease;
+        }
+        return WORLD_W / 2;
+      }
+    }
+
+    function renderAscii(t) {
       gctx.clearRect(0, 0, GRID_COLS, GRID_ROWS);
-      gctx.drawImage(sceneCanvas, 0, 0, WORLD_W, WORLD_H, 0, 0, GRID_COLS, GRID_ROWS);
+      if (isMobileMode) {
+        let targetX = getPanScanX(t);
+        const cropW = WORLD_H * ((GRID_COLS * CHAR_W) / (GRID_ROWS * CHAR_H));
+        let cropX = targetX - cropW / 2;
+        cropX = Math.max(0, Math.min(WORLD_W - cropW, cropX));
+        gctx.drawImage(sceneCanvas, cropX, 0, cropW, WORLD_H, 0, 0, GRID_COLS, GRID_ROWS);
+      } else {
+        gctx.drawImage(sceneCanvas, 0, 0, WORLD_W, WORLD_H, 0, 0, GRID_COLS, GRID_ROWS);
+      }
       const data = gctx.getImageData(0, 0, GRID_COLS, GRID_ROWS).data;
 
       mctx.fillStyle = '#02040a';
@@ -950,7 +1062,7 @@
           let lum = (maxColor / 255) * noise;
           if (lum > 1) lum = 1;
 
-          if (lum < 0.05) continue; 
+          if (lum < 0.05) continue;
 
           const rampIdx = Math.min(RAMP.length - 1, Math.floor(lum * RAMP.length));
           const ch = RAMP[rampIdx];
@@ -962,7 +1074,7 @@
       }
     }
 
-    const DURATION = 32.5;
+    const DURATION = 35.0;
     let playing = false, curT = 0, lastFrameTime = null;
     let isExporting = false, mediaRecorder = null, recordedChunks = [];
 
@@ -971,6 +1083,13 @@
     const exportBtn = document.getElementById('exportBtn');
     const uploadBtn = document.getElementById('uploadBtn');
     const posterUpload = document.getElementById('posterUpload');
+    const formatSelect = document.getElementById('formatSelect');
+
+    formatSelect.addEventListener('change', (e) => {
+      isMobileMode = e.target.value === 'mobile';
+      updateGridSize();
+      if (!playing) renderAppFrame();
+    });
 
     uploadBtn.addEventListener('click', () => posterUpload.click());
     posterUpload.addEventListener('change', (e) => {
@@ -986,42 +1105,20 @@
 
     function fmt(s) { const m = Math.floor(s / 60), sec = Math.floor(s % 60); return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`; }
 
-    function frame(now) {
-      if (playing) {
-        if (lastFrameTime === null) lastFrameTime = now;
-        const dt = (now - lastFrameTime) / 1000;
-        lastFrameTime = now;
-        curT += dt;
-
-        if (curT >= DURATION) {
-          if (isExporting) {
-            curT = DURATION;
-            playing = false;
-            isExporting = false;
-            mediaRecorder.stop();
-            exportBtn.innerHTML = '🎥 EXPORT';
-            exportBtn.disabled = false;
-          } else {
-            curT = 0;
-          }
-        }
-        scrubber.value = curT.toFixed(2);
-      }
-
+    function renderAppFrame() {
       drawWorld(curT);
 
-      if (curT > 18.8 && curT <= 23.1) { 
+      if (curT > 18.8 && curT <= 25.6) {
         if (posterImg.complete && posterImg.naturalHeight !== 0) {
-
           let imgW = posterImg.naturalWidth;
           let imgH = posterImg.naturalHeight;
-          const padding = 200; 
-          const scale = Math.min((WORLD_W - padding) / imgW, (WORLD_H - padding) / imgH);
+          const padding = mainCanvas.width * 0.1;
+          const scale = Math.min((mainCanvas.width - padding) / imgW, (mainCanvas.height - padding) / imgH);
           imgW *= scale;
           imgH *= scale;
 
-          const xPos = WORLD_W / 2 - imgW / 2;
-          const yPos = WORLD_H / 2 - imgH / 2;
+          const xPos = mainCanvas.width / 2 - imgW / 2;
+          const yPos = mainCanvas.height / 2 - imgH / 2;
 
           mctx.fillStyle = '#02050a';
           mctx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
@@ -1030,44 +1127,64 @@
       }
 
       let yOffset = 0;
-      if (curT > 19.3 && curT <= 23.1) {
-        const pullProg = clamp01((curT - 20.8) / 0.8);
-        const ease = Math.pow(pullProg, 2);
-        yOffset = ease * WORLD_H * 1.1;
+      let asciiAlpha = 1.0;
+
+      if (curT > 19.3 && curT <= 24.6) {
+        const pullProg = clamp01((curT - 19.3) / 0.8);
+        yOffset = Math.pow(pullProg, 2) * mainCanvas.height * 1.1;
+      } else if (curT > 24.6 && curT <= 25.6) {
+        yOffset = 0;
+        asciiAlpha = clamp01((curT - 24.6) / 1.0);
       }
 
       mctx.save();
       if (yOffset > 0) mctx.translate(0, yOffset);
 
-      if (yOffset < WORLD_H) {
-        renderAscii();
+      if (yOffset < mainCanvas.height) {
+        mctx.globalAlpha = asciiAlpha;
+        renderAscii(curT);
       }
       mctx.restore();
 
       mctx.save();
-      mctx.globalAlpha = 0.7;
-      mctx.font = '700 36px monospace';
-      mctx.textAlign = 'right';
-
-      mctx.shadowColor = '#000000';
-      mctx.shadowBlur = 6;
-      mctx.shadowOffsetX = 2;
-      mctx.shadowOffsetY = 2;
-
-      mctx.fillStyle = '#ffffff';
-      mctx.fillText('tinkerhub.cealappuzha', mainCanvas.width - 30, mainCanvas.height - 80);
-      mctx.fillText('@luna_r_mist', mainCanvas.width - 30, mainCanvas.height - 30);
+      mctx.globalAlpha = 0.4;
+      mctx.font = "bold 14px 'JetBrains Mono', monospace";
+      mctx.textAlign = 'center';
+      
+      mctx.fillStyle = '#aaaaaa';
+      mctx.letterSpacing = '2px';
+      mctx.fillText('tinkerhub.cealappuzha', mainCanvas.width / 2, 30);
+      mctx.fillText('@luna_r_mist', mainCanvas.width / 2, mainCanvas.height - 20);
       mctx.restore();
 
       timecodeHud.textContent = `${fmt(curT)} / ${fmt(DURATION)}`;
       if (curT < 2.0) sceneLabel.textContent = "SCENE 0 / 5";
       else if (curT < 10.5) sceneLabel.textContent = "SCENE 1 / 5";
       else if (curT < 15.5) sceneLabel.textContent = "SCENE 2 / 5";
-      else if (curT < 23.1) sceneLabel.textContent = "SCENE 3 / 5";
-      else if (curT < 27.1) sceneLabel.textContent = "SCENE 4 / 5";
+      else if (curT < 25.6) sceneLabel.textContent = "SCENE 3 / 5";
+      else if (curT < 29.6) sceneLabel.textContent = "SCENE 4 / 5";
       else sceneLabel.textContent = "SCENE 5 / 5";
+    }
 
-      requestAnimationFrame(frame);
+    function frame(now) {
+      if (playing) {
+        if (lastFrameTime === null) lastFrameTime = now;
+        const dt = (now - lastFrameTime) / 1000;
+        lastFrameTime = now;
+        curT += dt;
+
+        if (curT >= DURATION) {
+          curT = 0;
+          playing = false;
+          playBtn.innerHTML = '▶ PLAY';
+        }
+        scrubber.value = curT.toFixed(2);
+      }
+
+      if (!isExporting) {
+        renderAppFrame();
+        requestAnimationFrame(frame);
+      }
     }
     requestAnimationFrame(frame);
 
@@ -1077,54 +1194,118 @@
       lastFrameTime = null;
       playBtn.innerHTML = playing ? '❚❚ PAUSE' : '▶ PLAY';
     });
+    
     document.getElementById('restartBtn').addEventListener('click', () => {
       if (isExporting) return;
       curT = 0; scrubber.value = 0;
     });
+    
     scrubber.addEventListener('input', () => {
       if (isExporting) { scrubber.value = curT.toFixed(2); return; }
       playing = false; playBtn.innerHTML = '▶ PLAY';
       curT = parseFloat(scrubber.value);
     });
 
-    exportBtn.addEventListener('click', () => {
+    exportBtn.addEventListener('click', async () => {
       if (isExporting) return;
 
-      curT = 0; scrubber.value = 0;
-      playing = true;
-      lastFrameTime = null;
+      if (!window.WebMMuxer) {
+          alert('WebMMuxer library is still loading or failed to load.');
+          return;
+      }
+
+      playing = false;
       isExporting = true;
-      exportBtn.innerHTML = 'RECORDING...';
+      exportBtn.innerHTML = 'ENCODING (0%)...';
       exportBtn.disabled = true;
-      playBtn.innerHTML = '❚❚ PAUSE';
+      playBtn.disabled = true;
+      scrubber.disabled = true;
 
-      const stream = mainCanvas.captureStream(30); 
-      mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'video/webm',
-        videoBitsPerSecond: 50000000 
+      const encW = Math.round(mainCanvas.width / 2) * 2;
+      const encH = Math.round(mainCanvas.height / 2) * 2;
+
+      let muxer = new WebMMuxer.Muxer({
+          target: new WebMMuxer.ArrayBufferTarget(),
+          video: { codec: 'V_VP9', width: encW, height: encH, frameRate: 30 }
       });
-      recordedChunks = [];
 
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) recordedChunks.push(e.data);
-      };
+      let videoEncoder = new VideoEncoder({
+          output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+          error: e => {
+              console.error(e);
+              alert('Video encoding error! Check console.');
+          }
+      });
 
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = 'TinkerHub_Orientation_ASCII.webm';
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }, 100);
-      };
+      videoEncoder.configure({
+          codec: 'vp09.00.50.08',
+          width: encW,
+          height: encH,
+          bitrate: 50_000_000, 
+      });
 
-      mediaRecorder.start();
+      const FPS = 30;
+      const totalFrames = Math.ceil(DURATION * FPS);
+
+      for (let i = 0; i <= totalFrames; i++) {
+          curT = i / FPS;
+          scrubber.value = curT.toFixed(2);
+          
+          renderAppFrame();
+          
+          try {
+              const vf = new VideoFrame(mainCanvas, { timestamp: Math.round(i * 1000000 / FPS) });
+              videoEncoder.encode(vf, { keyFrame: i % 30 === 0 });
+              vf.close();
+          } catch (err) {
+              alert("Export failed: " + err.message + "\n\nTip: Browsers block exporting if a local image taints the canvas. Please click 'UPLOAD POSTER' and select your image manually to fix this!");
+              isExporting = false;
+              exportBtn.innerHTML = '🎥 EXPORT';
+              exportBtn.disabled = false;
+              playBtn.disabled = false;
+              scrubber.disabled = false;
+              return;
+          }
+          
+          while (videoEncoder.encodeQueueSize > 2) {
+              await new Promise(r => setTimeout(r, 5));
+          }
+          
+          if (i % 5 === 0) {
+             exportBtn.innerHTML = `ENCODING (${Math.round((i/totalFrames)*100)}%)`;
+             await new Promise(r => setTimeout(r, 0));
+          }
+      }
+
+      exportBtn.innerHTML = 'FINALIZING...';
+      try {
+          await videoEncoder.flush();
+          muxer.finalize();
+          
+          const buffer = muxer.target.buffer;
+          const blob = new Blob([buffer], { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'TinkerHub_Orientation_ASCII_HQ.webm';
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+             document.body.removeChild(a);
+             URL.revokeObjectURL(url);
+          }, 100);
+      } catch (err) {
+          alert("Finalizing Error: " + err.message + "\n\nStack: " + err.stack);
+      }
+      
+      isExporting = false;
+      exportBtn.innerHTML = '🎥 EXPORT';
+      exportBtn.disabled = false;
+      playBtn.disabled = false;
+      scrubber.disabled = false;
+      curT = 0;
+      lastFrameTime = null;
+      requestAnimationFrame(frame);
     });
 
   </script>

@@ -259,8 +259,9 @@
       <button class="amber" id="playBtn">▶ PLAY</button>
       <button id="restartBtn">↺ RESTART</button>
       <select id="formatSelect">
-        <option value="pc">💻 16:9</option>
-        <option value="mobile">📱 9:16</option>
+        <option value="pc">💻 16:9 (High Res)</option>
+        <option value="mobile_landscape">📱 16:9 (Mobile Landscape)</option>
+        <option value="mobile">📱 9:16 (Vertical)</option>
       </select>
       <input type="file" id="posterUpload" accept="image/*" style="display: none;">
       <button class="pink" id="uploadBtn">🖼️ UPLOAD POSTER</button>
@@ -295,12 +296,15 @@
     const gridCanvas = document.createElement('canvas');
     const gctx = gridCanvas.getContext('2d', { willReadFrequently: true });
 
-    let isMobileMode = false;
+    let currentFormat = 'pc';
 
     function updateGridSize() {
-      if (isMobileMode) {
+      if (currentFormat === 'mobile') {
         GRID_COLS = 108;
         GRID_ROWS = 128;
+      } else if (currentFormat === 'mobile_landscape') {
+        GRID_COLS = 120;
+        GRID_ROWS = 45;
       } else {
         GRID_COLS = 200;
         GRID_ROWS = 75;
@@ -1037,7 +1041,7 @@
 
     function renderAscii(t) {
       gctx.clearRect(0, 0, GRID_COLS, GRID_ROWS);
-      if (isMobileMode) {
+      if (currentFormat === 'mobile') {
         let targetX = getPanScanX(t);
         const cropW = WORLD_H * ((GRID_COLS * CHAR_W) / (GRID_ROWS * CHAR_H));
         let cropX = targetX - cropW / 2;
@@ -1086,7 +1090,7 @@
     const formatSelect = document.getElementById('formatSelect');
 
     formatSelect.addEventListener('change', (e) => {
-      isMobileMode = e.target.value === 'mobile';
+      currentFormat = e.target.value;
       updateGridSize();
       if (!playing) renderAppFrame();
     });
@@ -1153,8 +1157,8 @@
       
       mctx.fillStyle = '#aaaaaa';
       mctx.letterSpacing = '2px';
-      mctx.fillText('tinkerhub.cealappuzha', mainCanvas.width / 2, 30);
-      mctx.fillText('@luna_r_mist', mainCanvas.width / 2, mainCanvas.height - 20);
+      mctx.fillText('tinkerhub.cealappuzha', mainCanvas.width / 2, mainCanvas.height / 2);
+      mctx.fillText('luna.r.mist', mainCanvas.width / 2, mainCanvas.height - 20);
       mctx.restore();
 
       timecodeHud.textContent = `${fmt(curT)} / ${fmt(DURATION)}`;

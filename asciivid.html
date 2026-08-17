@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>TinkerHub Orientation - Vibrant ASCII Edition</title>
+  <title>TinkerHub Orientation - ASCII Edition</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap');
 
@@ -170,12 +170,12 @@
       box-shadow: 0 0 8px rgba(0, 243, 255, 0.2), inset 0 0 8px rgba(0, 243, 255, 0.1);
       outline: none;
     }
-    
+
     select#formatSelect:hover {
       background: rgba(0, 243, 255, 0.15);
       box-shadow: 0 0 15px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.2);
     }
-    
+
     select#formatSelect option {
       background: #02040a;
       color: var(--primary);
@@ -303,8 +303,8 @@
         GRID_COLS = 108;
         GRID_ROWS = 128;
       } else if (currentFormat === 'mobile_landscape') {
-        GRID_COLS = 120;
-        GRID_ROWS = 45;
+        GRID_COLS = 160;
+        GRID_ROWS = 60;
       } else {
         GRID_COLS = 200;
         GRID_ROWS = 75;
@@ -313,7 +313,7 @@
       mainCanvas.height = GRID_ROWS * CHAR_H;
       mctx.textBaseline = 'top';
       mctx.font = `bold ${CHAR_H}px 'JetBrains Mono', monospace`;
-      
+
       gridCanvas.width = GRID_COLS;
       gridCanvas.height = GRID_ROWS;
       gctx.imageSmoothingEnabled = true;
@@ -461,10 +461,10 @@
       sctx.beginPath(); sctx.moveTo(-22, h / 2); sctx.lineTo(22, h / 2); sctx.strokeStyle = '#0a1128'; sctx.lineWidth = 12; sctx.stroke();
 
       sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
-      sctx.fillStyle = '#ff00a0'; sctx.font = '900 75px sans-serif';
-      sctx.fillText(text1, 0, -40);
-      sctx.fillStyle = '#00f3ff'; sctx.font = '900 75px sans-serif';
-      sctx.fillText(text2, 0, 40);
+      sctx.fillStyle = '#ff00a0'; sctx.font = '900 100px sans-serif';
+      sctx.fillText(text1.toUpperCase(), 0, -60);
+      sctx.fillStyle = '#00f3ff'; sctx.font = '900 100px sans-serif';
+      sctx.fillText(text2.toUpperCase(), 0, 60);
       sctx.restore();
     }
 
@@ -682,7 +682,7 @@
 
       const lscale = kfOvershoot([{ t: 0, v: 0 }, { t: 0.2, v: 0 }, { t: 0.55, v: 1 }], Math.min(t, 0.7), 0.08, 3, 6);
       if (t > 0.15) {
-        drawSpeechBubble(880, 300, 550, 220, 'Maker', 'Tinkerhub', lscale);
+        drawSpeechBubble(880, 260, 700, 300, 'Maker', 'Tinkerhub', lscale);
       }
 
       const doorAngle = kfOvershoot(T.door, t, 0.06, 3, 6);
@@ -770,15 +770,15 @@
 
       sctx.textAlign = 'center';
       if (t > 9.6 && t < 10.4) {
-        sctx.save(); sctx.font = '900 65px sans-serif'; sctx.fillStyle = '#ffea00';
+        sctx.save(); sctx.font = '900 80px sans-serif'; sctx.fillStyle = '#ffea00';
         sctx.fillText('NEAR MISS!', rp[0] + 50, rp[1] - 120); sctx.restore();
       }
       if (t > 10.9 && t < 11.7) {
-        sctx.save(); sctx.font = '900 70px sans-serif'; sctx.fillStyle = '#ff00a0';
+        sctx.save(); sctx.font = '900 85px sans-serif'; sctx.fillStyle = '#ff00a0';
         sctx.fillText('ALMOST!', rp[0] - 20, rp[1] - 150); sctx.restore();
       }
       if (t > 12.2 && t < 13.0) {
-        sctx.save(); sctx.font = '900 65px sans-serif'; sctx.fillStyle = '#00f3ff';
+        sctx.save(); sctx.font = '900 80px sans-serif'; sctx.fillStyle = '#00f3ff';
         sctx.fillText('SWOOSH!', rp[0] + 60, rp[1] - 130); sctx.restore();
       }
     }
@@ -881,21 +881,21 @@
 
       const maxW = WORLD_W - 100;
 
-      const dateText = 'DATE: 18th August';
-      sctx.font = `900 140px sans-serif`;
+      const dateText = '18TH AUGUST';
+      sctx.font = `900 200px sans-serif`;
       let dWidth = sctx.measureText(dateText).width;
-      let dSize = dWidth > maxW ? 140 * (maxW / dWidth) : 140;
+      let dSize = dWidth > maxW ? 200 * (maxW / dWidth) : 200;
       sctx.fillStyle = '#00f3ff';
       sctx.font = `900 ${dSize * Math.max(textScale, 0)}px sans-serif`;
-      sctx.fillText(dateText, WORLD_W / 2, WORLD_H / 2 - 80);
+      sctx.fillText(dateText, WORLD_W / 2, WORLD_H / 2 - 100);
 
-      const venueText = 'VENUE: Mech Seminar Hall';
-      sctx.font = `900 100px sans-serif`;
+      const venueText = 'MECH SEMINAR HALL';
+      sctx.font = `900 160px sans-serif`;
       let vWidth = sctx.measureText(venueText).width;
-      let vSize = vWidth > maxW ? 100 * (maxW / vWidth) : 100;
+      let vSize = vWidth > maxW ? 160 * (maxW / vWidth) : 160;
       sctx.fillStyle = '#ff00a0';
       sctx.font = `900 ${vSize * Math.max(textScale, 0)}px sans-serif`;
-      sctx.fillText(venueText, WORLD_W / 2, WORLD_H / 2 + 70);
+      sctx.fillText(venueText, WORLD_W / 2, WORLD_H / 2 + 100);
 
       sctx.restore();
     }
@@ -921,22 +921,22 @@
 
         sctx.save(); sctx.textAlign = 'center';
         let angle = y >= 420 ? 0 : Math.sin(t * 15) * 5;
-        sctx.translate(WORLD_W / 2, y); sctx.rotate(angle * Math.PI / 180);
+        sctx.translate(WORLD_W / 2 - 50, y); sctx.rotate(angle * Math.PI / 180);
 
-        sctx.fillStyle = '#ffffff'; sctx.font = '900 130px sans-serif';
-        sctx.fillText('TINKERHUB', 0, -180);
-        sctx.fillStyle = '#00f3ff'; sctx.font = '900 80px sans-serif';
-        sctx.fillText('CE ALAPPUZHA', 0, -70);
-        sctx.fillStyle = '#ff00a0'; sctx.font = '900 130px sans-serif';
-        sctx.fillText('WELCOMES', 0, 70);
-        sctx.fillText('JUNIORS', 0, 200);
+        sctx.fillStyle = '#ffffff'; sctx.font = '900 170px sans-serif';
+        sctx.fillText('TINKERHUB', 0, -210);
+        sctx.fillStyle = '#00f3ff'; sctx.font = '900 120px sans-serif';
+        sctx.fillText('CE ALAPPUZHA', 0, -80);
+        sctx.fillStyle = '#ff00a0'; sctx.font = '900 170px sans-serif';
+        sctx.fillText('WELCOMES', 0, 80);
+        sctx.fillText('JUNIORS', 0, 230);
 
         sctx.restore();
 
         if (t > hitTime) {
           const spideyDrop = clamp01((t - hitTime) / 0.3);
           const spideyY = -200 + (620 - (-200)) * spideyDrop;
-          const spideyX = WORLD_W / 2 + 500;
+          const spideyX = WORLD_W / 2 + 600;
 
           sctx.strokeStyle = '#ffffff'; sctx.lineWidth = 6;
           sctx.beginPath(); sctx.moveTo(spideyX, -100); sctx.lineTo(spideyX, spideyY - 140); sctx.stroke();
@@ -1022,18 +1022,18 @@
         const rp = kfOvershoot(T.runner, localT, 0.05, 3, 6);
         const camX = kfValue(T.camX, localT);
         if (localT > 16.5) {
-           const spideyCanvasX = 1900 - camX;
-           const blend = clamp01((localT - 16.5) / 1.0);
-           return (rp[0] - camX) * (1 - blend) + spideyCanvasX * blend;
+          const spideyCanvasX = 1900 - camX;
+          const blend = clamp01((localT - 16.5) / 1.0);
+          return (rp[0] - camX) * (1 - blend) + spideyCanvasX * blend;
         }
         return rp[0] - camX;
       } else if (localT < 27.6) {
         return WORLD_W / 2;
       } else {
         if (localT > 30.0) {
-           const prog = clamp01((localT - 30.0) / 1.5);
-           const ease = 1 - Math.pow(1 - prog, 3);
-           return 800 + (1480 - 800) * ease;
+          const prog = clamp01((localT - 30.0) / 1.5);
+          const ease = 1 - Math.pow(1 - prog, 3);
+          return 800 + (1480 - 800) * ease;
         }
         return WORLD_W / 2;
       }
@@ -1154,7 +1154,7 @@
       mctx.globalAlpha = 0.4;
       mctx.font = "bold 14px 'JetBrains Mono', monospace";
       mctx.textAlign = 'center';
-      
+
       mctx.fillStyle = '#aaaaaa';
       mctx.letterSpacing = '2px';
       mctx.fillText('tinkerhub.cealappuzha', mainCanvas.width / 2, mainCanvas.height / 2);
@@ -1198,12 +1198,12 @@
       lastFrameTime = null;
       playBtn.innerHTML = playing ? '❚❚ PAUSE' : '▶ PLAY';
     });
-    
+
     document.getElementById('restartBtn').addEventListener('click', () => {
       if (isExporting) return;
       curT = 0; scrubber.value = 0;
     });
-    
+
     scrubber.addEventListener('input', () => {
       if (isExporting) { scrubber.value = curT.toFixed(2); return; }
       playing = false; playBtn.innerHTML = '▶ PLAY';
@@ -1214,8 +1214,8 @@
       if (isExporting) return;
 
       if (!window.WebMMuxer) {
-          alert('WebMMuxer library is still loading or failed to load.');
-          return;
+        alert('WebMMuxer library is still loading or failed to load.');
+        return;
       }
 
       playing = false;
@@ -1229,79 +1229,79 @@
       const encH = Math.round(mainCanvas.height / 2) * 2;
 
       let muxer = new WebMMuxer.Muxer({
-          target: new WebMMuxer.ArrayBufferTarget(),
-          video: { codec: 'V_VP9', width: encW, height: encH, frameRate: 30 }
+        target: new WebMMuxer.ArrayBufferTarget(),
+        video: { codec: 'V_VP9', width: encW, height: encH, frameRate: 30 }
       });
 
       let videoEncoder = new VideoEncoder({
-          output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
-          error: e => {
-              console.error(e);
-              alert('Video encoding error! Check console.');
-          }
+        output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+        error: e => {
+          console.error(e);
+          alert('Video encoding error! Check console.');
+        }
       });
 
       videoEncoder.configure({
-          codec: 'vp09.00.50.08',
-          width: encW,
-          height: encH,
-          bitrate: 50_000_000, 
+        codec: 'vp09.00.50.08',
+        width: encW,
+        height: encH,
+        bitrate: 50_000_000,
       });
 
       const FPS = 30;
       const totalFrames = Math.ceil(DURATION * FPS);
 
       for (let i = 0; i <= totalFrames; i++) {
-          curT = i / FPS;
-          scrubber.value = curT.toFixed(2);
-          
-          renderAppFrame();
-          
-          try {
-              const vf = new VideoFrame(mainCanvas, { timestamp: Math.round(i * 1000000 / FPS) });
-              videoEncoder.encode(vf, { keyFrame: i % 30 === 0 });
-              vf.close();
-          } catch (err) {
-              alert("Export failed: " + err.message + "\n\nTip: Browsers block exporting if a local image taints the canvas. Please click 'UPLOAD POSTER' and select your image manually to fix this!");
-              isExporting = false;
-              exportBtn.innerHTML = '🎥 EXPORT';
-              exportBtn.disabled = false;
-              playBtn.disabled = false;
-              scrubber.disabled = false;
-              return;
-          }
-          
-          while (videoEncoder.encodeQueueSize > 2) {
-              await new Promise(r => setTimeout(r, 5));
-          }
-          
-          if (i % 5 === 0) {
-             exportBtn.innerHTML = `ENCODING (${Math.round((i/totalFrames)*100)}%)`;
-             await new Promise(r => setTimeout(r, 0));
-          }
+        curT = i / FPS;
+        scrubber.value = curT.toFixed(2);
+
+        renderAppFrame();
+
+        try {
+          const vf = new VideoFrame(mainCanvas, { timestamp: Math.round(i * 1000000 / FPS) });
+          videoEncoder.encode(vf, { keyFrame: i % 30 === 0 });
+          vf.close();
+        } catch (err) {
+          alert("Export failed: " + err.message + "\n\nTip: Browsers block exporting if a local image taints the canvas. Please click 'UPLOAD POSTER' and select your image manually to fix this!");
+          isExporting = false;
+          exportBtn.innerHTML = '🎥 EXPORT';
+          exportBtn.disabled = false;
+          playBtn.disabled = false;
+          scrubber.disabled = false;
+          return;
+        }
+
+        while (videoEncoder.encodeQueueSize > 2) {
+          await new Promise(r => setTimeout(r, 5));
+        }
+
+        if (i % 5 === 0) {
+          exportBtn.innerHTML = `ENCODING (${Math.round((i / totalFrames) * 100)}%)`;
+          await new Promise(r => setTimeout(r, 0));
+        }
       }
 
       exportBtn.innerHTML = 'FINALIZING...';
       try {
-          await videoEncoder.flush();
-          muxer.finalize();
-          
-          const buffer = muxer.target.buffer;
-          const blob = new Blob([buffer], { type: 'video/webm' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'TinkerHub_Orientation_ASCII_HQ.webm';
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(() => {
-             document.body.removeChild(a);
-             URL.revokeObjectURL(url);
-          }, 100);
+        await videoEncoder.flush();
+        muxer.finalize();
+
+        const buffer = muxer.target.buffer;
+        const blob = new Blob([buffer], { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'TinkerHub_Orientation_ASCII_HQ.webm';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 100);
       } catch (err) {
-          alert("Finalizing Error: " + err.message + "\n\nStack: " + err.stack);
+        alert("Finalizing Error: " + err.message + "\n\nStack: " + err.stack);
       }
-      
+
       isExporting = false;
       exportBtn.innerHTML = '🎥 EXPORT';
       exportBtn.disabled = false;
